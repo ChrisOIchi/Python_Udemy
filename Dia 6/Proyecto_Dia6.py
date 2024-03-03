@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from os import system
+import msvcrt
 
 base = Path.home()
 categorias = Path(base / "Recetas")
@@ -23,17 +24,38 @@ def desplegar_menu():
 
 
 def limpiar_consola():
-    return system('cls')
+    if os.name == 'nt':  # Windows
+        return system('cls')
+    else:  # Linux, macOS
+        return system('clear')
+
 
 
 def mostrar_categorias(recetas):
-    elementos=os.listdir(recetas)
-    print(elementos)
+    limpiar_consola()
+    elementos = os.listdir(recetas)
+    for id, categoria in enumerate(elementos):
+        print(f'{id +1}. {categoria}')
+    return (elementos)
 
+def seleccionar_categoria(lista_categoria):
+    sel_num_categoria = int(input('Seleccione el número de la categoría: '))
+    categoria_seleccionada = lista_categoria[sel_num_categoria - 1]
+    return categoria_seleccionada
+
+def seleccionar_receta(lista_receta):
+    sel_num_receta = int(input('Seleccione el número de la receta: '))
+    receta = lista_receta[sel_num_receta - 1]
+    return receta
+
+def mostrar_recetas(categoria):
+    link_txt = Path(categorias / categoria)
+    archivos = os.listdir(link_txt)
+    for id, archivo in enumerate(archivos):
+        print(f'{id +1}. {archivo}')
+    return archivos
 
 def leer_eliminar_receta(opc):
-    print('Seleccionar categoria')
-    print('Seleccionar receta')
     if opc == 1:
         print('receta dice...')
     else:
@@ -41,9 +63,13 @@ def leer_eliminar_receta(opc):
 
 
 def leer_crear_borrar(opc):
-    mostrar_categorias()
+    lista_categoria= mostrar_categorias(categorias)
+    categoria= seleccionar_categoria(lista_categoria)
+    print(categoria)
     if opc == 1 or opc == 4:
-        print('leyendo o borrando receta')
+        lista_receta= mostrar_recetas(categoria)
+        receta = seleccionar_receta(lista_receta)
+        print(receta)
         leer_eliminar_receta(opc)
     else:
         print('creando nueva receta')
@@ -63,4 +89,5 @@ while repetir:
         repetir = False
     else:
         print('No es una opcion valida')
-    input('\nPresionar cualquier botón para continuar...')
+    print('\nPresionar cualquier botón para continuar...')
+    msvcrt.getch()
